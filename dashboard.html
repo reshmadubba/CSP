@@ -794,7 +794,6 @@ async function loadPolice() {
     const container = getContainer();
 
     container.innerHTML = `
-
         <h2>👮 Manage Police Stations</h2>
 
         <div class="dashboard-card">
@@ -836,15 +835,37 @@ async function loadPolice() {
 
     try {
 
-        const data =
-            await getJSON(
-                API_URL + "/api/police"
+        const response = await fetch(
+            API_URL + "/api/police"
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Police API returned " + response.status
             );
+
+        }
+
+        const data = await response.json();
+
+        console.log("Police data:", data);
 
         const list =
             document.getElementById("policeList");
 
         list.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+
+            list.innerHTML = `
+                <div class="dashboard-card">
+                    <p>No police station information available.</p>
+                </div>
+            `;
+
+            return;
+        }
 
         data.forEach(item => {
 
@@ -910,10 +931,26 @@ async function loadPolice() {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Police loading error:",
+            error
+        );
 
-        container.innerHTML +=
-            "<p>❌ Unable to load police information.</p>";
+        document.getElementById("policeList").innerHTML = `
+
+            <div class="dashboard-card">
+
+                <p>
+                    ❌ Unable to load police station information.
+                </p>
+
+                <p>
+                    Backend response could not be loaded.
+                </p>
+
+            </div>
+
+        `;
 
     }
 
