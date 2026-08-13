@@ -7,54 +7,157 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log("QR Local Information System loaded successfully.");
 
+    /* =========================================
+       BACKEND API URL
+       ========================================= */
+
+    const API_URL =
+        "https://qr-local-information-system.onrender.com";
+
 
     /* =========================================
        LOGIN FORM
        ========================================= */
 
-    const loginForm = document.getElementById("loginForm");
+    const loginForm =
+        document.getElementById("loginForm");
 
     if (loginForm) {
 
-        loginForm.addEventListener("submit", function (event) {
+        loginForm.addEventListener(
+            "submit",
+            async function (event) {
 
-            event.preventDefault();
+                event.preventDefault();
 
-            const usernameElement = document.getElementById("username");
-            const passwordElement = document.getElementById("password");
+                const usernameElement =
+                    document.getElementById("username");
 
-            const username = usernameElement
-                ? usernameElement.value.trim()
-                : "";
+                const passwordElement =
+                    document.getElementById("password");
 
-            const password = passwordElement
-                ? passwordElement.value.trim()
-                : "";
+                const username =
+                    usernameElement
+                        ? usernameElement.value.trim()
+                        : "";
 
-            if (username === "" || password === "") {
-                alert("Please enter both username and password.");
-                return;
+                const password =
+                    passwordElement
+                        ? passwordElement.value.trim()
+                        : "";
+
+                const message =
+                    document.getElementById("login-message");
+
+
+                if (username === "" || password === "") {
+
+                    if (message) {
+                        message.textContent =
+                            "Please enter both username and password.";
+
+                        message.style.color = "red";
+                    }
+
+                    return;
+                }
+
+
+                if (message) {
+                    message.textContent =
+                        "Checking login details...";
+
+                    message.style.color = "";
+                }
+
+
+                try {
+
+                    const response = await fetch(
+                        API_URL + "/api/login",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                username: username,
+                                password: password
+                            })
+                        }
+                    );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (response.ok && data.success) {
+
+                        if (message) {
+                            message.textContent =
+                                "Login successful!";
+
+                            message.style.color =
+                                "green";
+                        }
+
+
+                        localStorage.setItem(
+                            "adminLoggedIn",
+                            "true"
+                        );
+
+
+                        setTimeout(function () {
+
+                            window.location.href =
+                                "dashboard.html";
+
+                        }, 500);
+
+                    }
+
+                    else {
+
+                        if (message) {
+                            message.textContent =
+                                data.message ||
+                                "Invalid username or password.";
+
+                            message.style.color =
+                                "red";
+                        }
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Login Error:",
+                        error
+                    );
+
+
+                    if (message) {
+
+                        message.textContent =
+                            "Unable to connect to the backend.";
+
+                        message.style.color =
+                            "red";
+
+                    }
+
+                }
+
             }
-
-            /*
-             * TEMPORARY FRONTEND LOGIN
-             * This is only for testing.
-             * Real authentication will be connected
-             * to the backend later.
-             */
-
-            if (username === "admin" && password === "admin123") {
-
-                alert("Login successful!");
-
-                window.location.href = "dashboard.html";
-
-            } else {
-
-                alert("Invalid username or password.");
-
-            }
-        });
+        );
     }
 
 
@@ -65,16 +168,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const serviceCards =
         document.querySelectorAll(".service-card");
 
+
     serviceCards.forEach(function (card) {
 
-        card.addEventListener("click", function () {
+        card.addEventListener(
+            "click",
+            function () {
 
-            const page = card.getAttribute("data-page");
+                const page =
+                    card.getAttribute("data-page");
 
-            if (page) {
-                window.location.href = page;
+                if (page) {
+                    window.location.href = page;
+                }
+
             }
-        });
+        );
+
     });
 
 
@@ -85,87 +195,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const infoButtons =
         document.querySelectorAll(".info-button");
 
+
     infoButtons.forEach(function (button) {
 
-        button.addEventListener("click", function (event) {
+        button.addEventListener(
+            "click",
+            function (event) {
 
-            event.stopPropagation();
+                event.stopPropagation();
 
-            const page = button.getAttribute("data-page");
+                const page =
+                    button.getAttribute("data-page");
 
-            if (page) {
-                window.location.href = page;
-            }
-        });
-    });
-
-
-    /* =========================================
-       DASHBOARD BUTTONS
-       ========================================= */
-
-    const dashboardButtons =
-        document.querySelectorAll(".dashboard-button");
-
-    dashboardButtons.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            const buttonText =
-                button.textContent.trim().toLowerCase();
-
-
-            if (buttonText.includes("hospital")) {
-
-                window.location.href = "hospital.html";
-
-            }
-
-            else if (buttonText.includes("police")) {
-
-                window.location.href = "police.html";
-
-            }
-
-            else if (buttonText.includes("emergency")) {
-
-                window.location.href = "emergency.html";
-
-            }
-
-            else if (buttonText.includes("transport")) {
-
-                window.location.href = "transport.html";
-
-            }
-
-            else if (buttonText.includes("government")) {
-
-                window.location.href = "government.html";
-
-            }
-
-            else if (buttonText.includes("announcement")) {
-
-                window.location.href = "announcement.html";
-
-            }
-
-        });
-    });
-
-
-    /* =========================================
-       CURRENT YEAR
-       ========================================= */
-
-    const yearElements =
-        document.querySelectorAll(".current-year");
-
-    yearElements.forEach(function (element) {
-
-        element.textContent = new Date().getFullYear();
-
-    });
-
-});
+                if
