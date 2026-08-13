@@ -143,7 +143,8 @@
 
 <script>
 
-const API_URL = "https://qr-local-information-system.onrender.com";
+const API_URL =
+    "https://qr-local-information-system.onrender.com";
 
 
 // ==========================================
@@ -161,15 +162,18 @@ if (localStorage.getItem("adminLoggedIn") !== "true") {
 // LOGOUT
 // ==========================================
 
-document.getElementById("logoutBtn").addEventListener("click", function(event) {
+document.getElementById("logoutBtn").addEventListener(
+    "click",
+    function(event) {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    localStorage.removeItem("adminLoggedIn");
+        localStorage.removeItem("adminLoggedIn");
 
-    window.location.href = "login.html";
+        window.location.href = "login.html";
 
-});
+    }
+);
 
 
 // ==========================================
@@ -179,6 +183,40 @@ document.getElementById("logoutBtn").addEventListener("click", function(event) {
 function getContainer() {
 
     return document.getElementById("dashboardData");
+
+}
+
+
+// ==========================================
+// ESCAPE TEXT
+// ==========================================
+
+function escapeText(text) {
+
+    return String(text || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "");
+
+}
+
+
+// ==========================================
+// API ERROR CHECK
+// ==========================================
+
+async function checkResponse(response) {
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Server returned status " + response.status
+        );
+
+    }
+
+    return await response.json();
 
 }
 
@@ -224,12 +262,22 @@ async function loadAnnouncements() {
         const response =
             await fetch(API_URL + "/api/announcements");
 
-        const data = await response.json();
+        const data =
+            await checkResponse(response);
 
         const list =
             document.getElementById("announcementList");
 
         list.innerHTML = "";
+
+        if (data.length === 0) {
+
+            list.innerHTML =
+                "<p>No announcements available.</p>";
+
+            return;
+
+        }
 
         data.forEach(item => {
 
@@ -237,7 +285,7 @@ async function loadAnnouncements() {
 
                 <div class="dashboard-card">
 
-                    <h3>${item.title}</h3>
+                    <h3>📢 ${item.title}</h3>
 
                     <p>${item.content}</p>
 
@@ -251,7 +299,7 @@ async function loadAnnouncements() {
                             ${item.id},
                             '${escapeText(item.title)}',
                             '${escapeText(item.content)}',
-                            '${item.date}'
+                            '${escapeText(item.date)}'
                         )">
                         ✏️ Edit
                     </button>
@@ -267,9 +315,13 @@ async function loadAnnouncements() {
 
         });
 
-    } catch (error) {
+    }
 
-        container.innerHTML +=
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("announcementList").innerHTML =
             "<p>Unable to load announcements.</p>";
 
     }
@@ -280,10 +332,10 @@ async function loadAnnouncements() {
 async function addAnnouncement() {
 
     const title =
-        document.getElementById("annTitle").value;
+        document.getElementById("annTitle").value.trim();
 
     const content =
-        document.getElementById("annContent").value;
+        document.getElementById("annContent").value.trim();
 
     const date =
         document.getElementById("annDate").value;
@@ -296,30 +348,50 @@ async function addAnnouncement() {
 
     }
 
-    await fetch(API_URL + "/api/announcements", {
+    try {
 
-        method: "POST",
+        const response =
+            await fetch(API_URL + "/api/announcements", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                method: "POST",
 
-        body: JSON.stringify({
-            title: title,
-            content: content,
-            date: date
-        })
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    });
+                body: JSON.stringify({
+                    title,
+                    content,
+                    date
+                })
 
-    alert("Announcement added successfully!");
+            });
 
-    loadAnnouncements();
+        await checkResponse(response);
+
+        alert("Announcement added successfully!");
+
+        loadAnnouncements();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to add announcement.");
+
+    }
 
 }
 
 
-async function editAnnouncement(id, oldTitle, oldContent, oldDate) {
+async function editAnnouncement(
+    id,
+    oldTitle,
+    oldContent,
+    oldDate
+) {
 
     const title =
         prompt("Enter new title:", oldTitle);
@@ -336,43 +408,76 @@ async function editAnnouncement(id, oldTitle, oldContent, oldDate) {
 
     if (date === null) return;
 
-    await fetch(API_URL + "/api/announcements/" + id, {
+    try {
 
-        method: "PUT",
+        const response =
+            await fetch(
+                API_URL + "/api/announcements/" + id,
+                {
+                    method: "PUT",
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-        body: JSON.stringify({
-            title: title,
-            content: content,
-            date: date
-        })
+                    body: JSON.stringify({
+                        title,
+                        content,
+                        date
+                    })
+                }
+            );
 
-    });
+        await checkResponse(response);
 
-    alert("Announcement updated successfully!");
+        alert("Announcement updated successfully!");
 
-    loadAnnouncements();
+        loadAnnouncements();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to update announcement.");
+
+    }
 
 }
 
 
 async function deleteAnnouncement(id) {
 
-    if (!confirm("Are you sure you want to delete this announcement?"))
-        return;
+    if (!confirm(
+        "Are you sure you want to delete this announcement?"
+    )) return;
 
-    await fetch(API_URL + "/api/announcements/" + id, {
+    try {
 
-        method: "DELETE"
+        const response =
+            await fetch(
+                API_URL + "/api/announcements/" + id,
+                {
+                    method: "DELETE"
+                }
+            );
 
-    });
+        await checkResponse(response);
 
-    alert("Announcement deleted successfully!");
+        alert("Announcement deleted successfully!");
 
-    loadAnnouncements();
+        loadAnnouncements();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to delete announcement.");
+
+    }
 
 }
 
@@ -412,65 +517,83 @@ async function loadHospitals() {
 
         </div>
 
-        <div id="hospitalList">Loading...</div>
+        <div id="hospitalList">
+            Loading...
+        </div>
     `;
 
-    const response =
-        await fetch(API_URL + "/api/hospitals");
+    try {
 
-    const data = await response.json();
+        const response =
+            await fetch(API_URL + "/api/hospitals");
 
-    const list =
-        document.getElementById("hospitalList");
+        const data =
+            await checkResponse(response);
 
-    list.innerHTML = "";
+        const list =
+            document.getElementById("hospitalList");
 
-    data.forEach(item => {
+        list.innerHTML = "";
 
-        list.innerHTML += `
+        data.forEach(item => {
 
-            <div class="dashboard-card">
+            list.innerHTML += `
 
-                <h3>🏥 ${item.name}</h3>
+                <div class="dashboard-card">
 
-                <p>
-                    <strong>Location:</strong>
-                    ${item.location}
-                </p>
+                    <h3>🏥 ${item.name}</h3>
 
-                <p>
-                    <strong>Services:</strong>
-                    ${item.services}
-                </p>
+                    <p>
+                        <strong>Location:</strong>
+                        ${item.location}
+                    </p>
 
-                <a href="${item.map_link}"
-                   target="_blank"
-                   class="map-button">
-                    🗺️ View Location
-                </a>
+                    <p>
+                        <strong>Services:</strong>
+                        ${item.services}
+                    </p>
 
-                <br><br>
+                    <a href="${item.map_link}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="map-button">
+                        🗺️ View Location
+                    </a>
 
-                <button class="dashboard-button"
-                    onclick="editHospital(
-                        ${item.id},
-                        '${escapeText(item.name)}',
-                        '${escapeText(item.location)}',
-                        '${escapeText(item.services)}',
-                        '${escapeText(item.map_link)}'
-                    )">
-                    ✏️ Edit
-                </button>
+                    <br><br>
 
-                <button class="dashboard-button"
-                    onclick="deleteHospital(${item.id})">
-                    🗑️ Delete
-                </button>
+                    <button class="dashboard-button"
+                        onclick="editHospital(
+                            ${item.id},
+                            '${escapeText(item.name)}',
+                            '${escapeText(item.location)}',
+                            '${escapeText(item.services)}',
+                            '${escapeText(item.map_link)}'
+                        )">
+                        ✏️ Edit
+                    </button>
 
-            </div>
-        `;
+                    <button class="dashboard-button"
+                        onclick="deleteHospital(${item.id})">
+                        🗑️ Delete
+                    </button>
 
-    });
+                </div>
+
+            `;
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("hospitalList").innerHTML =
+            "<p>Unable to load hospitals.</p>";
+
+    }
 
 }
 
@@ -478,16 +601,16 @@ async function loadHospitals() {
 async function addHospital() {
 
     const name =
-        document.getElementById("hospitalName").value;
+        document.getElementById("hospitalName").value.trim();
 
     const location =
-        document.getElementById("hospitalLocation").value;
+        document.getElementById("hospitalLocation").value.trim();
 
     const services =
-        document.getElementById("hospitalServices").value;
+        document.getElementById("hospitalServices").value.trim();
 
     const map_link =
-        document.getElementById("hospitalMap").value;
+        document.getElementById("hospitalMap").value.trim();
 
     if (!name || !location) {
 
@@ -497,31 +620,52 @@ async function addHospital() {
 
     }
 
-    await fetch(API_URL + "/api/hospitals", {
+    try {
 
-        method: "POST",
+        const response =
+            await fetch(API_URL + "/api/hospitals", {
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                method: "POST",
 
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-    });
+                body: JSON.stringify({
+                    name,
+                    location,
+                    services,
+                    map_link
+                })
 
-    alert("Hospital added successfully!");
+            });
 
-    loadHospitals();
+        await checkResponse(response);
+
+        alert("Hospital added successfully!");
+
+        loadHospitals();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to add hospital.");
+
+    }
 
 }
 
 
-async function editHospital(id, oldName, oldLocation, oldServices, oldMap) {
+async function editHospital(
+    id,
+    oldName,
+    oldLocation,
+    oldServices,
+    oldMap
+) {
 
     const name =
         prompt("Hospital name:", oldName);
@@ -543,26 +687,42 @@ async function editHospital(id, oldName, oldLocation, oldServices, oldMap) {
 
     if (map_link === null) return;
 
-    await fetch(API_URL + "/api/hospitals/" + id, {
+    try {
 
-        method: "PUT",
+        const response =
+            await fetch(
+                API_URL + "/api/hospitals/" + id,
+                {
+                    method: "PUT",
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
+                    body: JSON.stringify({
+                        name,
+                        location,
+                        services,
+                        map_link
+                    })
+                }
+            );
 
-    });
+        await checkResponse(response);
 
-    alert("Hospital updated successfully!");
+        alert("Hospital updated successfully!");
 
-    loadHospitals();
+        loadHospitals();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to update hospital.");
+
+    }
 
 }
 
@@ -572,13 +732,31 @@ async function deleteHospital(id) {
     if (!confirm("Delete this hospital?"))
         return;
 
-    await fetch(API_URL + "/api/hospitals/" + id, {
-        method: "DELETE"
-    });
+    try {
 
-    alert("Hospital deleted successfully!");
+        const response =
+            await fetch(
+                API_URL + "/api/hospitals/" + id,
+                {
+                    method: "DELETE"
+                }
+            );
 
-    loadHospitals();
+        await checkResponse(response);
+
+        alert("Hospital deleted successfully!");
+
+        loadHospitals();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        alert("Unable to delete hospital.");
+
+    }
 
 }
 
@@ -618,65 +796,83 @@ async function loadPolice() {
 
         </div>
 
-        <div id="policeList">Loading...</div>
+        <div id="policeList">
+            Loading...
+        </div>
     `;
 
-    const response =
-        await fetch(API_URL + "/api/police");
+    try {
 
-    const data = await response.json();
+        const response =
+            await fetch(API_URL + "/api/police");
 
-    const list =
-        document.getElementById("policeList");
+        const data =
+            await checkResponse(response);
 
-    list.innerHTML = "";
+        const list =
+            document.getElementById("policeList");
 
-    data.forEach(item => {
+        list.innerHTML = "";
 
-        list.innerHTML += `
+        data.forEach(item => {
 
-            <div class="dashboard-card">
+            list.innerHTML += `
 
-                <h3>👮 ${item.name}</h3>
+                <div class="dashboard-card">
 
-                <p>
-                    <strong>Location:</strong>
-                    ${item.location}
-                </p>
+                    <h3>👮 ${item.name}</h3>
 
-                <p>
-                    <strong>Services:</strong>
-                    ${item.services}
-                </p>
+                    <p>
+                        <strong>Location:</strong>
+                        ${item.location}
+                    </p>
 
-                <a href="${item.map_link}"
-                   target="_blank"
-                   class="map-button">
-                    🗺️ View Location
-                </a>
+                    <p>
+                        <strong>Services:</strong>
+                        ${item.services}
+                    </p>
 
-                <br><br>
+                    <a href="${item.map_link}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="map-button">
+                        🗺️ View Location
+                    </a>
 
-                <button class="dashboard-button"
-                    onclick="editPolice(
-                        ${item.id},
-                        '${escapeText(item.name)}',
-                        '${escapeText(item.location)}',
-                        '${escapeText(item.services)}',
-                        '${escapeText(item.map_link)}'
-                    )">
-                    ✏️ Edit
-                </button>
+                    <br><br>
 
-                <button class="dashboard-button"
-                    onclick="deletePolice(${item.id})">
-                    🗑️ Delete
-                </button>
+                    <button class="dashboard-button"
+                        onclick="editPolice(
+                            ${item.id},
+                            '${escapeText(item.name)}',
+                            '${escapeText(item.location)}',
+                            '${escapeText(item.services)}',
+                            '${escapeText(item.map_link)}'
+                        )">
+                        ✏️ Edit
+                    </button>
 
-            </div>
-        `;
+                    <button class="dashboard-button"
+                        onclick="deletePolice(${item.id})">
+                        🗑️ Delete
+                    </button>
 
-    });
+                </div>
+
+            `;
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        document.getElementById("policeList").innerHTML =
+            "<p>Unable to load police stations.</p>";
+
+    }
 
 }
 
@@ -684,663 +880,113 @@ async function loadPolice() {
 async function addPolice() {
 
     const name =
-        document.getElementById("policeName").value;
+        document.getElementById("policeName").value.trim();
 
     const location =
-        document.getElementById("policeLocation").value;
+        document.getElementById("policeLocation").value.trim();
 
     const services =
-        document.getElementById("policeServices").value;
+        document.getElementById("policeServices").value.trim();
 
     const map_link =
-        document.getElementById("policeMap").value;
+        document.getElementById("policeMap").value.trim();
 
-    await fetch(API_URL + "/api/police", {
+    if (!name || !location) {
 
-        method: "POST",
+        alert("Station name and location are required.");
 
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
-
-    });
-
-    alert("Police station added successfully!");
-
-    loadPolice();
-
-}
-
-
-async function editPolice(id, oldName, oldLocation, oldServices, oldMap) {
-
-    const name = prompt("Station name:", oldName);
-    if (name === null) return;
-
-    const location = prompt("Location:", oldLocation);
-    if (location === null) return;
-
-    const services = prompt("Services:", oldServices);
-    if (services === null) return;
-
-    const map_link = prompt("Map URL:", oldMap);
-    if (map_link === null) return;
-
-    await fetch(API_URL + "/api/police/" + id, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
-
-    });
-
-    alert("Police station updated successfully!");
-
-    loadPolice();
-
-}
-
-
-async function deletePolice(id) {
-
-    if (!confirm("Delete this police station?"))
         return;
 
-    await fetch(API_URL + "/api/police/" + id, {
-        method: "DELETE"
-    });
+    }
 
-    alert("Police station deleted successfully!");
+    try {
 
-    loadPolice();
+        const response =
+            await fetch(API_URL + "/api/police", {
 
-}
+                method: "POST",
 
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-// ==========================================
-// GOVERNMENT
-// ==========================================
+                body: JSON.stringify({
+                    name,
+                    location,
+                    services,
+                    map_link
+                })
 
-async function loadGovernment() {
+            });
 
-    const container = getContainer();
+        await checkResponse(response);
 
-    container.innerHTML = `
+        alert("Police station added successfully!");
 
-        <h2>🏛️ Government Offices</h2>
+        loadPolice();
 
-        <div class="dashboard-card">
+    }
 
-            <h3>➕ Add Government Office</h3>
+    catch (error) {
 
-            <input id="govName"
-                   placeholder="Office name">
+        console.error(error);
 
-            <input id="govLocation"
-                   placeholder="Location">
+        alert("Unable to add police station.");
 
-            <input id="govServices"
-                   placeholder="Services">
-
-            <input id="govMap"
-                   placeholder="Google Maps URL">
-
-            <button class="dashboard-button"
-                    onclick="addGovernment()">
-                Add Government Office
-            </button>
-
-        </div>
-
-        <div id="governmentList">Loading...</div>
-    `;
-
-    const response =
-        await fetch(API_URL + "/api/government");
-
-    const data = await response.json();
-
-    const list =
-        document.getElementById("governmentList");
-
-    list.innerHTML = "";
-
-    data.forEach(item => {
-
-        list.innerHTML += `
-
-            <div class="dashboard-card">
-
-                <h3>🏛️ ${item.name}</h3>
-
-                <p>
-                    <strong>Location:</strong>
-                    ${item.location}
-                </p>
-
-                <p>
-                    <strong>Services:</strong>
-                    ${item.services}
-                </p>
-
-                <a href="${item.map_link}"
-                   target="_blank"
-                   class="map-button">
-                    🗺️ View Location
-                </a>
-
-                <br><br>
-
-                <button class="dashboard-button"
-                    onclick="editGovernment(
-                        ${item.id},
-                        '${escapeText(item.name)}',
-                        '${escapeText(item.location)}',
-                        '${escapeText(item.services)}',
-                        '${escapeText(item.map_link)}'
-                    )">
-                    ✏️ Edit
-                </button>
-
-                <button class="dashboard-button"
-                    onclick="deleteGovernment(${item.id})">
-                    🗑️ Delete
-                </button>
-
-            </div>
-        `;
-
-    });
+    }
 
 }
 
 
-async function addGovernment() {
-
-    const name = document.getElementById("govName").value;
-    const location = document.getElementById("govLocation").value;
-    const services = document.getElementById("govServices").value;
-    const map_link = document.getElementById("govMap").value;
-
-    await fetch(API_URL + "/api/government", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
-
-    });
-
-    alert("Government office added successfully!");
-
-    loadGovernment();
-
-}
-
-
-async function editGovernment(id, oldName, oldLocation, oldServices, oldMap) {
-
-    const name = prompt("Office name:", oldName);
-    if (name === null) return;
-
-    const location = prompt("Location:", oldLocation);
-    if (location === null) return;
-
-    const services = prompt("Services:", oldServices);
-    if (services === null) return;
-
-    const map_link = prompt("Map URL:", oldMap);
-    if (map_link === null) return;
-
-    await fetch(API_URL + "/api/government/" + id, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            location,
-            services,
-            map_link
-        })
-
-    });
-
-    alert("Government office updated successfully!");
-
-    loadGovernment();
-
-}
-
-
-async function deleteGovernment(id) {
-
-    if (!confirm("Delete this government office?"))
-        return;
-
-    await fetch(API_URL + "/api/government/" + id, {
-        method: "DELETE"
-    });
-
-    alert("Government office deleted successfully!");
-
-    loadGovernment();
-
-}
-
-
-// ==========================================
-// TRANSPORT
-// ==========================================
-
-async function loadTransport() {
-
-    const container = getContainer();
-
-    container.innerHTML = `
-
-        <h2>🚌 Public Transport</h2>
-
-        <div class="dashboard-card">
-
-            <h3>➕ Add Transport</h3>
-
-            <input id="transportName"
-                   placeholder="Transport name">
-
-            <input id="transportType"
-                   placeholder="Transport type">
-
-            <input id="transportLocation"
-                   placeholder="Location">
-
-            <input id="transportDetails"
-                   placeholder="Details">
-
-            <input id="transportMap"
-                   placeholder="Google Maps URL">
-
-            <button class="dashboard-button"
-                    onclick="addTransport()">
-                Add Transport
-            </button>
-
-        </div>
-
-        <div id="transportList">Loading...</div>
-    `;
-
-    const response =
-        await fetch(API_URL + "/api/transport");
-
-    const data = await response.json();
-
-    const list =
-        document.getElementById("transportList");
-
-    list.innerHTML = "";
-
-    data.forEach(item => {
-
-        list.innerHTML += `
-
-            <div class="dashboard-card">
-
-                <h3>🚌 ${item.name}</h3>
-
-                <p>
-                    <strong>Type:</strong>
-                    ${item.transport_type}
-                </p>
-
-                <p>
-                    <strong>Location:</strong>
-                    ${item.location}
-                </p>
-
-                <p>
-                    <strong>Details:</strong>
-                    ${item.details}
-                </p>
-
-                <a href="${item.map_link}"
-                   target="_blank"
-                   class="map-button">
-                    🗺️ View Location
-                </a>
-
-                <br><br>
-
-                <button class="dashboard-button"
-                    onclick="editTransport(
-                        ${item.id},
-                        '${escapeText(item.name)}',
-                        '${escapeText(item.transport_type)}',
-                        '${escapeText(item.location)}',
-                        '${escapeText(item.details)}',
-                        '${escapeText(item.map_link)}'
-                    )">
-                    ✏️ Edit
-                </button>
-
-                <button class="dashboard-button"
-                    onclick="deleteTransport(${item.id})">
-                    🗑️ Delete
-                </button>
-
-            </div>
-        `;
-
-    });
-
-}
-
-
-async function addTransport() {
-
-    const name = document.getElementById("transportName").value;
-    const transport_type = document.getElementById("transportType").value;
-    const location = document.getElementById("transportLocation").value;
-    const details = document.getElementById("transportDetails").value;
-    const map_link = document.getElementById("transportMap").value;
-
-    await fetch(API_URL + "/api/transport", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            transport_type,
-            location,
-            details,
-            map_link
-        })
-
-    });
-
-    alert("Transport added successfully!");
-
-    loadTransport();
-
-}
-
-
-async function editTransport(id, oldName, oldType, oldLocation, oldDetails, oldMap) {
-
-    const name = prompt("Transport name:", oldName);
-    if (name === null) return;
-
-    const transport_type = prompt("Transport type:", oldType);
-    if (transport_type === null) return;
-
-    const location = prompt("Location:", oldLocation);
-    if (location === null) return;
-
-    const details = prompt("Details:", oldDetails);
-    if (details === null) return;
-
-    const map_link = prompt("Map URL:", oldMap);
-    if (map_link === null) return;
-
-    await fetch(API_URL + "/api/transport/" + id, {
-
-        method: "PUT",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            transport_type,
-            location,
-            details,
-            map_link
-        })
-
-    });
-
-    alert("Transport updated successfully!");
-
-    loadTransport();
-
-}
-
-
-async function deleteTransport(id) {
-
-    if (!confirm("Delete this transport information?"))
-        return;
-
-    await fetch(API_URL + "/api/transport/" + id, {
-        method: "DELETE"
-    });
-
-    alert("Transport deleted successfully!");
-
-    loadTransport();
-
-}
-
-
-// ==========================================
-// EMERGENCY
-// ==========================================
-
-async function loadEmergency() {
-
-    const container = getContainer();
-
-    container.innerHTML = `
-
-        <h2>🚨 Emergency Services</h2>
-
-        <div class="dashboard-card">
-
-            <h3>➕ Add Emergency Service</h3>
-
-            <input id="emergencyName"
-                   placeholder="Service name">
-
-            <input id="emergencyDescription"
-                   placeholder="Description">
-
-            <input id="emergencyNumber"
-                   placeholder="Emergency number">
-
-            <button class="dashboard-button"
-                    onclick="addEmergency()">
-                Add Emergency Service
-            </button>
-
-        </div>
-
-        <div id="emergencyList">Loading...</div>
-    `;
-
-    const response =
-        await fetch(API_URL + "/api/emergency");
-
-    const data = await response.json();
-
-    const list =
-        document.getElementById("emergencyList");
-
-    list.innerHTML = "";
-
-    data.forEach(item => {
-
-        list.innerHTML += `
-
-            <div class="dashboard-card">
-
-                <h3>🚨 ${item.name}</h3>
-
-                <p>
-                    <strong>Description:</strong>
-                    ${item.description}
-                </p>
-
-                <p>
-                    <strong>Emergency Number:</strong>
-                    ${item.service_number}
-                </p>
-
-                <button class="dashboard-button"
-                    onclick="editEmergency(
-                        ${item.id},
-                        '${escapeText(item.name)}',
-                        '${escapeText(item.description)}',
-                        '${escapeText(item.service_number)}'
-                    )">
-                    ✏️ Edit
-                </button>
-
-                <button class="dashboard-button"
-                    onclick="deleteEmergency(${item.id})">
-                    🗑️ Delete
-                </button>
-
-            </div>
-        `;
-
-    });
-
-}
-
-
-async function addEmergency() {
+async function editPolice(
+    id,
+    oldName,
+    oldLocation,
+    oldServices,
+    oldMap
+) {
 
     const name =
-        document.getElementById("emergencyName").value;
+        prompt("Station name:", oldName);
 
-    const description =
-        document.getElementById("emergencyDescription").value;
-
-    const service_number =
-        document.getElementById("emergencyNumber").value;
-
-    await fetch(API_URL + "/api/emergency", {
-
-        method: "POST",
-
-        headers: {
-            "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-            name,
-            description,
-            service_number
-        })
-
-    });
-
-    alert("Emergency service added successfully!");
-
-    loadEmergency();
-
-}
-
-
-async function editEmergency(id, oldName, oldDescription, oldNumber) {
-
-    const name = prompt("Service name:", oldName);
     if (name === null) return;
 
-    const description = prompt("Description:", oldDescription);
-    if (description === null) return;
+    const location =
+        prompt("Location:", oldLocation);
 
-    const service_number = prompt("Emergency number:", oldNumber);
-    if (service_number === null) return;
+    if (location === null) return;
 
-    await fetch(API_URL + "/api/emergency/" + id, {
+    const services =
+        prompt("Services:", oldServices);
 
-        method: "PUT",
+    if (services === null) return;
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+    const map_link =
+        prompt("Map URL:", oldMap);
 
-        body: JSON.stringify({
-            name,
-            description,
-            service_number
-        })
+    if (map_link === null) return;
 
-    });
+    try {
 
-    alert("Emergency service updated successfully!");
+        const response =
+            await fetch(
+                API_URL + "/api/police/" + id,
+                {
+                    method: "PUT",
 
-    loadEmergency();
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-}
+                    body: JSON.stringify({
+                        name,
+                        location,
+                        services,
+                        map_link
+                    })
+                }
+            );
 
+        await checkResponse(response);
 
-async function deleteEmergency(id) {
-
-    if (!confirm("Delete this emergency service?"))
-        return;
-
-    await fetch(API_URL + "/api/emergency/" + id, {
-        method: "DELETE"
-    });
-
-    alert("Emergency service deleted successfully!");
-
-    loadEmergency();
-
-}
-
-
-// ==========================================
-// ESCAPE TEXT
-// ==========================================
-
-function escapeText(text) {
-
-    if (!text) return "";
-
-    return String(text)
-        .replace(/\\/g, "\\\\")
-        .replace(/'/g, "\\'")
-        .replace(/\n/g, " ");
-
-}
-
-</script>
-
-</body>
-
-</html>
+        alert("Police st
