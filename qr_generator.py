@@ -1,7 +1,7 @@
 import qrcode
 
 # ONE QR CODE FOR THE ENTIRE LOCAL INFORMATION SYSTEM
-website_url = "https://reshmadubba.github.io/CSP/"
+website_url = "https://reshmadubba.github.io/CSP/index.html"
 
 qr = qrcode.QRCode(
     version=1,
