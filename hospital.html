@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nearby Hospitals - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="hospital.html">Hospitals</a>
+                </li>
+
+                <li>
+                    <a href="police.html">Police</a>
+                </li>
+
+                <li>
+                    <a href="emergency.html">Emergency</a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>🏥 Nearby Hospitals</h2>
+
+        <p>
+            Find hospitals and healthcare facilities around
+            the Vizianagaram area. This page provides useful
+            information such as hospital name, location,
+            services and map directions.
+        </p>
+
+    </section>
+
+
+    <!-- ================= HOSPITAL LIST ================= -->
+
+    <section class="hospital-list" id="hospital-list">
+
+        <h2>Hospitals in Vizianagaram</h2>
+
+        <p id="loading-message">
+            Loading hospital information...
+        </p>
+
+    </section>
+
+
+    <!-- ================= IMPORTANT NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+            <strong>Note:</strong>
+
+            Hospital information is provided to help users
+            locate nearby healthcare facilities. Please
+            verify current services and timings before
+            visiting.
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR Local Information System</h3>
+
+            <p>
+                Making local information easier to access.
+            </p>
+
+            <p>
+                &copy;
+                <span class="current-year"></span>
+                QR Local Information System
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= HOSPITAL API ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+        fetch(API_URL + "/api/hospitals")
+
+            .then(response => {
+
+                console.log("Response status:", response.status);
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " + response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                console.log("Hospital data:", data);
+
+                const container =
+                    document.getElementById("hospital-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check whether database contains hospitals
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <div class="emergency-note">
+
+                            <p>
+                                No hospital information is
+                                currently available.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+                // Create hospital cards
+
+                data.forEach(hospital => {
+
+                    container.innerHTML += `
+
+                        <div class="hospital-card">
+
+                            <h3>
+                                🏥 ${hospital.name}
+                            </h3>
+
+                            <p>
+                                <strong>Location:</strong>
+                                ${hospital.location}
+                            </p>
+
+                            <p>
+                                <strong>Services:</strong>
+                                ${hospital.services}
+                            </p>
+
+                            <a
+                                class="map-button"
+                                href="${hospital.map_link}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                🗺️ View Location on Map
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Hospital API Error:",
+                    error
+                );
+
+                const container =
+                    document.getElementById("hospital-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+                            <strong>
+                                Unable to load hospital information.
+                            </strong>
+                        </p>
+
+                        <p>
+                            Please make sure the Flask backend
+                            server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+
+        // Current year
+
+        document.querySelector(
+            ".current-year"
+        ).textContent = new Date().getFullYear();
+
+    </script>
+
+
+</body>
+
+</html>

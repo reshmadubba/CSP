@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Government Offices - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="index.html#services">Services</a>
+                </li>
+
+                <li>
+                    <a href="index.html#about">About</a>
+                </li>
+
+                <li>
+                    <a href="login.html">Admin Login</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>🏛️ Government Offices in Vizianagaram</h2>
+
+        <p>
+            Find important government offices and public service
+            information in the Vizianagaram area.
+        </p>
+
+    </section>
+
+
+    <!-- ================= GOVERNMENT OFFICES ================= -->
+
+    <section class="government-list" id="government-list">
+
+        <h2>Important Government Offices</h2>
+
+        <p id="loading-message">
+            Loading government office information...
+        </p>
+
+    </section>
+
+
+    <!-- ================= IMPORTANT NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+
+            <strong>Note:</strong>
+
+            Government office information is provided to
+            help citizens locate public services. Please
+            verify office timings and available services
+            before visiting.
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR-Based Local Information System</h3>
+
+            <p>
+                Making public services easily accessible
+                through QR technology.
+            </p>
+
+            <p>
+                &copy; 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= GOVERNMENT API ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+
+        fetch(API_URL + "/api/government")
+
+            .then(response => {
+
+                console.log(
+                    "Government API response status:",
+                    response.status
+                );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+
+            .then(data => {
+
+                console.log(
+                    "Government office data:",
+                    data
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "government-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check whether database has data
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <p>
+                            No government office information
+                            is currently available.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // Create government office cards
+
+                data.forEach(office => {
+
+                    container.innerHTML += `
+
+                        <div class="government-card">
+
+                            <h3>
+                                🏛️ ${office.name}
+                            </h3>
+
+                            <p>
+
+                                📍
+                                <strong>
+                                    Location:
+                                </strong>
+
+                                ${office.location}
+
+                            </p>
+
+
+                            <p>
+
+                                📋
+                                <strong>
+                                    Services:
+                                </strong>
+
+                                ${office.services}
+
+                            </p>
+
+
+                            <a
+                                href="${office.map_link}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="map-button"
+                            >
+
+                                🗺️ View Location
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Government API Error:",
+                    error
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "government-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+
+                            <strong>
+                                Unable to load government
+                                office information.
+                            </strong>
+
+                        </p>
+
+                        <p>
+                            Please make sure the Flask
+                            backend server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>

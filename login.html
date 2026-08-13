@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login - QR Local Info</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="index.html#services">Services</a>
+                </li>
+
+                <li>
+                    <a href="index.html#about">About</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= LOGIN SECTION ================= -->
+
+    <section class="login-section">
+
+        <div class="login-container">
+
+            <h2>🔐 Admin Login</h2>
+
+            <p>
+                Login to manage public information and announcements.
+            </p>
+
+
+            <!-- LOGIN FORM -->
+
+            <form id="loginForm">
+
+                <!-- USERNAME -->
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter username"
+                        required>
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter password"
+                        required>
+
+                </div>
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button
+                    type="submit"
+                    class="login-button">
+
+                    Login
+
+                </button>
+
+            </form>
+
+
+            <!-- MESSAGE -->
+
+            <p id="login-message"></p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR-Based Local Information System</h3>
+
+            <p>
+                Making public services easily accessible through QR technology.
+            </p>
+
+            <p>
+                © 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= LOGIN JAVASCRIPT ================= -->
+
+    <script>
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+
+                const username =
+                    document.getElementById("username").value;
+
+                const password =
+                    document.getElementById("password").value;
+
+                const message =
+                    document.getElementById("login-message");
+
+
+                message.textContent =
+                    "Checking login details...";
+
+
+                try {
+
+                    const response = await fetch(
+                        "http://127.0.0.1:5000/api/login",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                username: username,
+                                password: password
+                            })
+                        }
+                    );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (response.ok && data.success) {
+
+                        message.textContent =
+                            "Login successful!";
+
+                        message.style.color =
+                            "green";
+
+
+                        /*
+                         * Store login status
+                         */
+
+                        localStorage.setItem(
+                            "adminLoggedIn",
+                            "true"
+                        );
+
+
+                        /*
+                         * Open admin dashboard
+                         */
+
+                        setTimeout(function() {
+
+                            window.location.href =
+                                "dashboard.html";
+
+                        }, 500);
+
+                    }
+
+                    else {
+
+                        message.textContent =
+                            data.message ||
+                            "Invalid username or password.";
+
+                        message.style.color =
+                            "red";
+
+                    }
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "Login Error:",
+                        error
+                    );
+
+
+                    message.textContent =
+                        "Unable to connect to the backend.";
+
+                    message.style.color =
+                        "red";
+
+                }
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>

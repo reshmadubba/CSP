@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Public Transport - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="index.html#services">Services</a>
+                </li>
+
+                <li>
+                    <a href="index.html#about">About</a>
+                </li>
+
+                <li>
+                    <a href="login.html">Admin Login</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>🚌 Public Transport in Vizianagaram</h2>
+
+        <p>
+            Find useful information about public transportation,
+            important transport points and locations in Vizianagaram.
+        </p>
+
+    </section>
+
+
+    <!-- ================= TRANSPORT INFORMATION ================= -->
+
+    <section class="transport-list" id="transport-list">
+
+        <h2>Important Transport Points</h2>
+
+        <p id="loading-message">
+            Loading transport information...
+        </p>
+
+    </section>
+
+
+    <!-- ================= IMPORTANT NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+
+            <strong>Note:</strong>
+
+            Transport information is provided to help users
+            locate important transportation points. Please
+            verify current timings and availability before travelling.
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR-Based Local Information System</h3>
+
+            <p>
+                Making public services easily accessible
+                through QR technology.
+            </p>
+
+            <p>
+                &copy; 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= TRANSPORT API JAVASCRIPT ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+
+        fetch(API_URL + "/api/transport")
+
+            .then(response => {
+
+                console.log(
+                    "Transport API response status:",
+                    response.status
+                );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+
+            .then(data => {
+
+                console.log(
+                    "Transport data:",
+                    data
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "transport-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check database data
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <p>
+                            No transport information
+                            is currently available.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // Create transport cards
+
+                data.forEach(transport => {
+
+                    container.innerHTML += `
+
+                        <div class="transport-card">
+
+                            <h3>
+                                🚌 ${transport.name}
+                            </h3>
+
+
+                            <p>
+
+                                📍
+
+                                <strong>
+                                    Location:
+                                </strong>
+
+                                ${transport.location}
+
+                            </p>
+
+
+                            <p>
+
+                                🚌
+
+                                <strong>
+                                    Type:
+                                </strong>
+
+                                ${transport.transport_type}
+
+                            </p>
+
+
+                            <p>
+
+                                📋
+
+                                <strong>
+                                    Details:
+                                </strong>
+
+                                ${transport.details}
+
+                            </p>
+
+
+                            <a
+                                href="${transport.map_link}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="map-button"
+                            >
+
+                                🗺️ View Location
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Transport API Error:",
+                    error
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "transport-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+
+                            <strong>
+                                Unable to load transport
+                                information.
+                            </strong>
+
+                        </p>
+
+                        <p>
+                            Please make sure the Flask
+                            backend server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>

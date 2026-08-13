@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Police Stations - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="index.html#services">Services</a>
+                </li>
+
+                <li>
+                    <a href="index.html#about">About</a>
+                </li>
+
+                <li>
+                    <a href="login.html">Admin Login</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>🚔 Police Stations in Vizianagaram</h2>
+
+        <p>
+            Find important police station information in Vizianagaram,
+            including locations and details to help citizens access
+            police services easily.
+        </p>
+
+    </section>
+
+
+    <!-- ================= POLICE INFORMATION ================= -->
+
+    <section class="police-list" id="police-list">
+
+        <h2>Available Police Services</h2>
+
+        <p id="loading-message">
+            Loading police station information...
+        </p>
+
+    </section>
+
+
+    <!-- ================= IMPORTANT NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+
+            <strong>Note:</strong>
+
+            Police station information is provided to help users
+            locate nearby police services. Please verify current
+            information before visiting.
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR-Based Local Information System</h3>
+
+            <p>
+                Making public services easily accessible through QR technology.
+            </p>
+
+            <p>
+                &copy; 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= POLICE API JAVASCRIPT ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+        fetch(API_URL + "/api/police")
+
+            .then(response => {
+
+                console.log(
+                    "Police API response status:",
+                    response.status
+                );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                console.log(
+                    "Police data:",
+                    data
+                );
+
+                const container =
+                    document.getElementById("police-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check whether database has data
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <div class="emergency-note">
+
+                            <p>
+                                No police station information
+                                is currently available.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+                // Create police station cards
+
+                data.forEach(police => {
+
+                    container.innerHTML += `
+
+                        <div class="police-card">
+
+                            <h3>
+                                🚔 ${police.name}
+                            </h3>
+
+                            <p>
+
+                                📍
+                                <strong>
+                                    Location:
+                                </strong>
+
+                                ${police.location}
+
+                            </p>
+
+                            <p>
+
+                                🚔
+                                <strong>
+                                    Services:
+                                </strong>
+
+                                ${police.services}
+
+                            </p>
+
+                            <a
+                                href="${police.map_link}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="map-button"
+                            >
+
+                                🗺️ View Location
+
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Police API Error:",
+                    error
+                );
+
+                const container =
+                    document.getElementById("police-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+
+                            <strong>
+                                Unable to load police
+                                station information.
+                            </strong>
+
+                        </p>
+
+                        <p>
+                            Please make sure the backend
+                            server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>

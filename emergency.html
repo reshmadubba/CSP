@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Emergency Services - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="index.html#services">Services</a>
+                </li>
+
+                <li>
+                    <a href="index.html#about">About</a>
+                </li>
+
+                <li>
+                    <a href="login.html">Admin Login</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>🚨 Emergency Services</h2>
+
+        <p>
+            Quickly find important emergency contact numbers and
+            services available to citizens and visitors in Vizianagaram.
+        </p>
+
+    </section>
+
+
+    <!-- ================= EMERGENCY INFORMATION ================= -->
+
+    <section class="emergency-list" id="emergency-list">
+
+        <h2>Important Emergency Contacts</h2>
+
+        <p id="loading-message">
+            Loading emergency services...
+        </p>
+
+    </section>
+
+
+    <!-- ================= EMERGENCY NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+            ⚠️ Please use emergency numbers only when immediate
+            assistance is required.
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>QR-Based Local Information System</h3>
+
+            <p>
+                Making public services easily accessible through QR technology.
+            </p>
+
+            <p>
+                &copy; 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= EMERGENCY API JAVASCRIPT ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+        fetch(API_URL + "/api/emergency")
+
+            .then(response => {
+
+                console.log(
+                    "Emergency API response status:",
+                    response.status
+                );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(data => {
+
+                console.log(
+                    "Emergency data:",
+                    data
+                );
+
+                const container =
+                    document.getElementById("emergency-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check whether database has data
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <div class="emergency-note">
+
+                            <p>
+                                No emergency information
+                                is currently available.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                    return;
+                }
+
+
+                // Create emergency cards
+
+                data.forEach(emergency => {
+
+                    container.innerHTML += `
+
+                        <div class="emergency-card">
+
+                            <h3>
+                                🚨 ${emergency.name}
+                            </h3>
+
+                            <p>
+                                ${emergency.description}
+                            </p>
+
+                            <p>
+                                📞 Emergency Number:
+                                <strong>
+                                    ${emergency.service_number}
+                                </strong>
+                            </p>
+
+                            <a
+                                href="tel:${emergency.service_number}"
+                                class="call-button"
+                            >
+                                📞 Call ${emergency.service_number}
+                            </a>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Emergency API Error:",
+                    error
+                );
+
+                const container =
+                    document.getElementById("emergency-list");
+
+                const loading =
+                    document.getElementById("loading-message");
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+
+                            <strong>
+                                Unable to load emergency
+                                information.
+                            </strong>
+
+                        </p>
+
+                        <p>
+                            Please make sure the Flask backend
+                            server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+    </script>
+
+
+</body>
+
+</html>

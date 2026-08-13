@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Local Announcements - QR Local Info</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <div class="logo">
+            <h1>QR Local Info</h1>
+        </div>
+
+        <nav>
+
+            <ul>
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="hospital.html">Hospitals</a>
+                </li>
+
+                <li>
+                    <a href="police.html">Police</a>
+                </li>
+
+                <li>
+                    <a href="emergency.html">Emergency</a>
+                </li>
+
+                <li>
+                    <a href="login.html">Admin Login</a>
+                </li>
+
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= PAGE INTRODUCTION ================= -->
+
+    <section class="page-intro">
+
+        <h2>📢 Local Announcements</h2>
+
+        <p>
+            Stay informed about important notices,
+            public information and local updates
+            relevant to the Vizianagaram area.
+        </p>
+
+    </section>
+
+
+    <!-- ================= ANNOUNCEMENTS ================= -->
+
+    <section
+        class="announcement-list"
+        id="announcement-list"
+    >
+
+        <h2>Latest Updates</h2>
+
+        <p id="loading-message">
+            Loading announcements...
+        </p>
+
+    </section>
+
+
+    <!-- ================= IMPORTANT NOTE ================= -->
+
+    <div class="emergency-note">
+
+        <p>
+
+            <strong>Note:</strong>
+
+            Announcements are updated by authorized
+            administrators through the Admin Dashboard.
+
+        </p>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-content">
+
+            <h3>
+                QR-Based Local Information System
+            </h3>
+
+            <p>
+                Making public services easily accessible
+                through QR technology.
+            </p>
+
+            <p>
+                &copy; 2026 QR-Based Local Information System.
+                All Rights Reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <!-- ================= ANNOUNCEMENT API ================= -->
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:5000";
+
+
+        fetch(API_URL + "/api/announcements")
+
+            .then(response => {
+
+                console.log(
+                    "Announcements API response status:",
+                    response.status
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Server returned status " +
+                        response.status
+                    );
+
+                }
+
+
+                return response.json();
+
+            })
+
+
+            .then(data => {
+
+                console.log(
+                    "Announcements data:",
+                    data
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "announcement-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                // Remove loading message
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                // Check database data
+
+                if (data.length === 0) {
+
+                    container.innerHTML += `
+
+                        <p>
+                            No announcements are
+                            currently available.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                // Create announcement cards
+
+                data.forEach(announcement => {
+
+                    container.innerHTML += `
+
+                        <div class="announcement-card">
+
+                            <h3>
+                                📢 ${announcement.title}
+                            </h3>
+
+
+                            <p>
+                                ${announcement.content}
+                            </p>
+
+
+                            <span>
+                                📅 ${announcement.date || "Date not specified"}
+                            </span>
+
+                        </div>
+
+                    `;
+
+                });
+
+            })
+
+
+            .catch(error => {
+
+                console.error(
+                    "Announcements API Error:",
+                    error
+                );
+
+
+                const container =
+                    document.getElementById(
+                        "announcement-list"
+                    );
+
+
+                const loading =
+                    document.getElementById(
+                        "loading-message"
+                    );
+
+
+                if (loading) {
+                    loading.remove();
+                }
+
+
+                container.innerHTML += `
+
+                    <div class="emergency-note">
+
+                        <p>
+
+                            <strong>
+                                Unable to load announcements.
+                            </strong>
+
+                        </p>
+
+                        <p>
+                            Please make sure the Flask
+                            backend server is running.
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+
+    </script>
+
+
+</body>
+
+</html>

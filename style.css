@@ -1,0 +1,440 @@
+/* =========================
+   GENERAL STYLES
+   ========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+a {
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+
+/* =========================
+   HEADER
+   ========================= */
+
+header {
+    background-color: #1e3a8a;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 8%;
+}
+
+.logo h1 {
+    font-size: 25px;
+}
+
+nav ul {
+    display: flex;
+    gap: 25px;
+}
+
+nav ul li a {
+    color: white;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #ffd700;
+}
+
+
+/* =========================
+   PAGE INTRODUCTION
+   ========================= */
+
+.page-intro {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: white;
+}
+
+.page-intro h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.page-intro p {
+    max-width: 750px;
+    margin: auto;
+    color: #555;
+}
+
+
+/* =========================
+   COMMON SECTION STYLES
+   ========================= */
+
+.hospital-list,
+.police-list,
+.transport-list,
+.government-list,
+.emergency-list,
+.announcement-list,
+.dashboard-section {
+    padding: 50px 8%;
+}
+
+.hospital-list > h2,
+.police-list > h2,
+.transport-list > h2,
+.government-list > h2,
+.emergency-list > h2,
+.announcement-list > h2,
+.dashboard-section > h2 {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+
+/* =========================
+   HOSPITAL CARDS
+   ========================= */
+
+.hospital-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.hospital-card h3 {
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   POLICE CARDS
+   ========================= */
+
+.police-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.police-card h3 {
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   TRANSPORT CARDS
+   ========================= */
+
+.transport-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.transport-card h3 {
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   GOVERNMENT CARDS
+   ========================= */
+
+.government-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.government-card h3 {
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   MAP BUTTON
+   ========================= */
+
+.map-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 18px;
+    background-color: #1e3a8a;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.map-button:hover {
+    background-color: #162d6b;
+}
+
+
+/* =========================
+   EMERGENCY CARDS
+   ========================= */
+
+.emergency-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    border-left: 5px solid #dc2626;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.emergency-card h3 {
+    margin-bottom: 12px;
+}
+
+.call-button {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 18px;
+    background-color: #dc2626;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.call-button:hover {
+    background-color: #b91c1c;
+}
+
+.emergency-note {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 15px;
+    background-color: #fff7ed;
+    border-radius: 8px;
+    text-align: center;
+}
+
+
+/* =========================
+   ANNOUNCEMENT CARDS
+   ========================= */
+
+.announcement-card {
+    background-color: white;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 800px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.announcement-card h3 {
+    margin-bottom: 10px;
+}
+
+.announcement-card span {
+    display: block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/* =========================
+   LOGIN
+   ========================= */
+
+.login-section {
+    min-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    background-color: white;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.login-container > p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #1e3a8a;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #162d6b;
+}
+
+
+/* =========================
+   DASHBOARD
+   ========================= */
+
+.dashboard-intro {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: white;
+}
+
+.dashboard-intro h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.dashboard-intro p {
+    color: #555;
+}
+
+.dashboard-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.dashboard-section > h2 {
+    grid-column: 1 / -1;
+}
+
+.dashboard-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-card h3 {
+    margin-bottom: 12px;
+}
+
+.dashboard-button {
+    margin-top: 15px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #1e3a8a;
+    color: white;
+    cursor: pointer;
+}
+
+.dashboard-button:hover {
+    background-color: #162d6b;
+}
+
+
+/* =========================
+   FOOTER
+   ========================= */
+
+footer {
+    background-color: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 40px;
+}
+
+.footer-content h3 {
+    margin-bottom: 10px;
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
+
+/* =========================
+   MOBILE RESPONSIVE DESIGN
+   ========================= */
+
+@media (max-width: 768px) {
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .page-intro h2,
+    .dashboard-intro h2 {
+        font-size: 26px;
+    }
+
+    .hospital-list,
+    .police-list,
+    .transport-list,
+    .government-list,
+    .emergency-list,
+    .announcement-list,
+    .dashboard-section {
+        padding: 35px 5%;
+    }
+
+}
